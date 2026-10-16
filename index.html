@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Related Rates: The Draining Tank</title>
+<style>
+  :root{--bg:#0e1420;--panel:#141d2f;--line:#2a3b5a;--txt:#e8eef7;--dim:#a9bce0;--accent:#5aa2ff;--gold:#ffd479;--green:#40c878;--red:#e06a6a}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--txt);line-height:1.6}
+  nav{position:sticky;top:0;z-index:10;display:flex;gap:22px;align-items:center;padding:14px 26px;background:rgba(14,20,32,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+  nav .logo{font-weight:bold;color:var(--accent);letter-spacing:.5px}
+  nav a{color:var(--dim);text-decoration:none;font-size:14px}
+  nav a:hover{color:#fff}
+  header.hero{max-width:980px;margin:0 auto;padding:70px 26px 30px;text-align:center}
+  .hero h1{font-size:clamp(30px,5vw,46px);margin:0 0 14px;color:#fff}
+  .hero .sub{color:var(--dim);font-size:18px;max-width:640px;margin:0 auto}
+  .kicker{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  section{max-width:1060px;margin:0 auto;padding:50px 26px}
+  h2{font-size:26px;color:#9fc4ff;margin-top:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+  .prob{font-size:17px;border-left:3px solid var(--accent);padding-left:16px}
+  .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+  .choice{background:#1a2438;border:1px solid var(--line);border-radius:9px;padding:10px 14px;cursor:pointer;transition:.15s}
+  .choice:hover{border-color:var(--accent)}
+  .choice.correct{border-color:var(--green);background:rgba(64,200,120,.15);color:#b8f5cf}
+  .choice.wrong{border-color:var(--red);background:rgba(224,106,106,.12)}
+  #sim{position:relative;height:600px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0e1420}
+  #sim canvas{display:block}
+  .simpanel{position:absolute;background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;backdrop-filter:blur(6px)}
+  #hud{top:12px;left:12px;width:290px;max-height:calc(100% - 24px);overflow:auto}
+  #hud h3{margin:0 0 6px;color:#9fc4ff;font-size:15px}
+  #hud .steps{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 0;margin:8px 0;font-size:12.5px}
+  #readout{top:12px;right:12px;text-align:right}
+  #readout .big{font-size:19px;color:#8fd0ff}
+  #readout .dv{color:#ff9d7a;font-size:16px}
+  .note{font-size:11px;color:#8fa3c8}
+  #ctrl{bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+  button{font-family:Georgia,serif;font-size:14px;background:#1d2c47;color:#dbe7ff;border:1px solid #3d5a8a;border-radius:8px;padding:8px 16px;cursor:pointer}
+  button:hover{background:#28406b}
+  input[type=range]{accent-color:var(--accent)}
+  label{font-size:12px;color:var(--dim)}
+  .steps2{font-size:16px}
+  .steps2 .line{padding:10px 0;border-bottom:1px dashed #22314e}
+  .steps2 .why{color:var(--dim);font-size:13.5px;margin-top:3px}
+  .steps2 b{color:var(--gold)}
+  .insight{background:rgba(255,212,121,.08);border:1px solid rgba(255,212,121,.35);border-radius:12px;padding:16px 20px;margin:22px 0}
+  .insight h3{margin:0 0 6px;color:var(--gold);font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left}
+  th{background:#1a2438;color:#9fc4ff}
+  td .why{color:var(--dim);font-size:13px;display:block;margin-top:2px}
+  .quiz .choice{margin:6px 0;max-width:560px}
+  .feedback{font-size:14px;margin-top:10px;min-height:22px}
+  .feedback.ok{color:#8fe0a8}.feedback.no{color:#f09a9a}
+  footer{border-top:1px solid var(--line);color:var(--dim);text-align:center;font-size:13px;padding:26px;margin-top:40px}
+  .math{font-family:'Cambria Math',Georgia,serif}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">∫ Related Rates</span>
+  <a href="#problem">Problem</a>
+  <a href="#demo">3D Lab</a>
+  <a href="#solution">Solution</a>
+  <a href="#trap">The Trap</a>
+  <a href="#practice">Practice</a>
+</nav>
+
+<header class="hero">
+  <div class="kicker">AP Calculus · Related Rates</div>
+  <h1>The Draining Water Tank</h1>
+  <p class="sub">An interactive 3D laboratory for a classic multiple-choice problem: watch the water fall, track the rates, and see why the answer never changes.</p>
+</header>
+
+<section id="problem">
+  <h2>The Problem</h2>
+  <div class="card prob">
+    A right cylindrical water tank with a diameter of 3 feet and a height of 6 feet is being drained.
+    At what rate is the volume of the water in the tank changing when the water level is dropping at a rate of 4 inches per minute?
+    <div class="choices">
+      <div class="choice" data-k="A">(A) −9π ft³/min</div>
+      <div class="choice" data-k="B">(B) −4.5π ft³/min</div>
+      <div class="choice" data-k="C">(C) −3π ft³/min</div>
+      <div class="choice" data-k="D">(D) −0.75π ft³/min</div>
+    </div>
+    <div class="feedback" id="probFb"></div>
+  </div>
+</section>
+
+<section id="demo">
+  <h2>3D Lab: Watch It Drain</h2>
+  <p style="color:var(--dim)">Drag to orbit the tank, scroll to zoom. Press <b style="color:#dbe7ff">Drain</b> and keep an eye on the dV/dt readout as the level falls.</p>
+  <div id="sim">
+    <div id="hud" class="simpanel">
+      <h3>Draining a Cylindrical Tank</h3>
+      Diameter 3 ft → radius r = 1.5 ft. Height 6 ft. Level drops at 4 in/min.
+      <div class="steps">
+        V = πr²h = 2.25π·h<br>
+        r constant ⇒ dV/dt = 2.25π·dh/dt<br>
+        dh/dt = −4 in/min = −1/3 ft/min<br>
+        dV/dt = 2.25π(−1/3) = <b>−0.75π ft³/min</b>
+      </div>
+      <span class="note">The rate is the same at every level. Drag the slider and watch it stay fixed.</span>
+    </div>
+    <div id="readout" class="simpanel">
+      depth h = <span class="big" id="hVal">6.00</span> ft<br>
+      volume V = 2.25πh = <span class="big" id="vVal">127.23</span> ft³<br>
+      <span class="dv">dV/dt = −0.75π ≈ −2.36 ft³/min</span><br>
+      <span class="note">(independent of h)</span>
+    </div>
+    <div id="ctrl" class="simpanel">
+      <button id="playBtn">Drain ▶</button>
+      <button id="resetBtn">Reset</button>
+      <label>water level <input id="hSlider" type="range" min="0" max="6" step="0.01" value="6"></label>
+      <label>speed <input id="spd" type="range" min="0.2" max="4" step="0.1" value="1" style="width:90px"></label>
+    </div>
+  </div>
+</section>
+
+<section id="solution">
+  <h2>Step-by-Step Solution</h2>
+  <div class="card steps2">
+    <div class="line"><b>1. Write the volume equation.</b><br>V = πr²h<br>
+      <span class="why">The tank is a right cylinder, so its volume is area of the circular base times the water depth.</span></div>
+    <div class="line"><b>2. Substitute the constant radius.</b><br>The diameter is 3 ft, so r = 1.5 ft and r² = 2.25. The radius never changes as the tank drains, so it is a constant, not a variable:<br>
+      V = 2.25π·h<br><span class="why">This turns a two-variable problem into a single-variable one. Nothing involving dr/dt will ever appear.</span></div>
+    <div class="line"><b>3. Differentiate with respect to time.</b><br>dV/dt = 2.25π · dh/dt<br><span class="why">The constant 2.25π just rides along; implicit differentiation of a constant times h is ordinary.</span></div>
+    <div class="line"><b>4. Convert units.</b><br>dh/dt = −4 in/min = −4/12 ft/min = −1/3 ft/min<br><span class="why">The classic trap. The answer choices are in cubic feet per minute, so the rate must be in feet per minute. The minus sign records that the level is dropping.</span></div>
+    <div class="line" style="border-bottom:none"><b>5. Multiply.</b><br>dV/dt = 2.25π · (−1/3) = <b>−0.75π ft³/min</b><br><span class="why">Negative because the tank is losing water. Answer (D).</span></div>
+  </div>
+  <div class="insight">
+    <h3>The insight most students miss</h3>
+    Because the radius is constant, the rate of volume change does not depend on how full the tank is. "When the water level is dropping..." sounds like it should matter, but for a cylinder it doesn't: dV/dt is −0.75π ft³/min at h = 6 ft, at h = 3 ft, at h = 1 inch. The phrase "when..." would only matter for a shape whose cross-section changes with height, like a cone or a sphere.
+  </div>
+</section>
+
+<section id="trap">
+  <h2>The Trap Detector</h2>
+  <div class="card">
+    <table>
+      <tr><th>Wrong choice</th><th>Where it comes from</th><th>What went wrong</th></tr>
+      <tr><td>(A) −9π</td><td>Using dh/dt = −4 directly: 2.25π · (−4)</td><td><span class="why">Forgot to convert 4 inches to 1/3 foot before differentiating.</span></td></tr>
+      <tr><td>(B) −4.5π</td><td>Using r = 3 (the diameter): π·9·(−1/3)·... or π·1.5²·(−4)/3 confusion</td><td><span class="why">Mixed up diameter and radius, or converted only one of the two rates.</span></td></tr>
+      <tr><td>(C) −3π</td><td>V = π·(1.5)²·h with dh/dt = −4/3 (half-converted)</td><td><span class="why">Divided by 3 but forgot the inches-to-feet step makes it −1/3, not −4/3.</span></td></tr>
+      <tr><td style="color:#b8f5cf">(D) −0.75π ✓</td><td>2.25π · (−1/3)</td><td><span class="why">Correct: radius in feet, rate converted, constant radius respected.</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="practice">
+  <h2>Test Yourself</h2>
+  <div class="card quiz">
+    <p><b>Q1.</b> The same tank is instead being <i>filled</i> at a rate such that the water level rises at 2 in/min. What is dV/dt?</p>
+    <div class="choice" data-q="1" data-k="a">+0.375π ft³/min</div>
+    <div class="choice" data-q="1" data-k="b">+1.5π ft³/min</div>
+    <div class="choice" data-q="1" data-k="c">+4.5π ft³/min</div>
+    <div class="feedback" data-fb="1"></div>
+    <p style="margin-top:26px"><b>Q2.</b> A <i>conical</i> tank (radius = height at every level) is draining at 0.25 ft³/min. At h = 2 ft, is dh/dt constant over time?</p>
+    <div class="choice" data-q="2" data-k="a">Yes, it is −1/(4π) ft/min the whole time</div>
+    <div class="choice" data-q="2" data-k="b">No; dh/dt becomes more negative as the tank empties</div>
+    <div class="choice" data-q="2" data-k="c">No; dh/dt becomes less negative as the tank empties</div>
+    <div class="feedback" data-fb="2"></div>
+  </div>
+</section>
+
+<footer>
+  Built as an interactive study aid for the related-rates cylinder problem · V = πr²h, and constants stay constant.
+</footer>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+// ---------- multiple choice logic ----------
+function wireChoice(rootSel, fbId, correctKey, okMsg, noMsg){
+  document.querySelectorAll(rootSel).forEach(el=>{
+    el.addEventListener('click',()=>{
+      document.querySelectorAll(rootSel).forEach(o=>o.classList.remove('correct','wrong'));
+      const fb=document.getElementById(fbId)||document.querySelector('[data-fb="'+(el.dataset.fb||'')+'"]');
+      if(el.dataset.k===correctKey){ el.classList.add('correct'); if(fb){fb.textContent=okMsg;fb.className='feedback ok';} }
+      else{ el.classList.add('wrong'); if(fb){fb.textContent=noMsg;fb.className='feedback no';} }
+    });
+  });
+}
+wireChoice('#problem .choice','probFb','D','Correct! 2.25π × (−1/3) = −0.75π ft³/min.','Not quite. Check the units on dh/dt: 4 inches per minute is 1/3 foot per minute.');
+wireChoice('.quiz .choice[data-q="1"]','',"a");
+wireChoice('.quiz .choice[data-q="2"]','',"b");
+// quiz feedback blocks
+const fb1=document.querySelector('[data-fb="1"]'), fb2=document.querySelector('[data-fb="2"]');
+document.querySelectorAll('.quiz .choice[data-q="1"]').forEach(el=>el.addEventListener('click',()=>{
+  fb1.className='feedback '+(el.dataset.k==='a'?'ok':'no');
+  fb1.textContent=el.dataset.k==='a'
+    ?'Correct. dV/dt = 2.25π · (1/6) = 0.375π ft³/min. Positive now: the tank is gaining water.'
+    :'Check it: dh/dt = 2 in/min = 1/6 ft/min, so dV/dt = 2.25π(1/6) = 0.375π, and it is positive.';
+}));
+document.querySelectorAll('.quiz .choice[data-q="2"]').forEach(el=>el.addEventListener('click',()=>{
+  fb2.className='feedback '+(el.dataset.k==='b'?'ok':'no');
+  fb2.textContent=el.dataset.k==='b'
+    ?'Correct. For a cone, V = (π/3)r²h with r = h gives V = (π/3)h³, so dV/dt = πh²·dh/dt. As h shrinks, a fixed dV/dt requires a larger |dh/dt|: the level falls faster near the bottom.'
+    :'Think about the shape: near the bottom the cone is skinny, so losing the same volume drops the level much faster. dh/dt = dV/dt ÷ (πh²) grows in magnitude as h → 0.';
+}));
+
+// ---------- 3D simulation ----------
+const R=1.5,H=6,RATE=-1/3;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0e1420);
+scene.fog=new THREE.Fog(0x0e1420,18,40);
+const simEl=document.getElementById('sim');
+const camera=new THREE.PerspectiveCamera(45,simEl.clientWidth/simEl.clientHeight,.1,100);
+camera.position.set(7.5,5.5,9);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(simEl.clientWidth,simEl.clientHeight);
+renderer.setPixelRatio(devicePixelRatio);
+simEl.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.target.set(0,2.6,0); controls.enableDamping=true;
+
+scene.add(new THREE.AmbientLight(0xbfd4ff,.55));
+const dl=new THREE.DirectionalLight(0xffffff,1.1); dl.position.set(6,10,5); scene.add(dl);
+const dl2=new THREE.DirectionalLight(0x88aaff,.4); dl2.position.set(-6,4,-6); scene.add(dl2);
+const grid=new THREE.GridHelper(20,20,0x24406b,0x16233b); scene.add(grid);
+
+const tank=new THREE.Group(); scene.add(tank);
+const glass=new THREE.Mesh(new THREE.CylinderGeometry(R,R,H,64,1,true),
+  new THREE.MeshPhysicalMaterial({color:0x9fd0ff,transparent:true,opacity:.16,roughness:.05,side:THREE.DoubleSide,depthWrite:false}));
+glass.position.y=H/2; tank.add(glass);
+const bottom=new THREE.Mesh(new THREE.CircleGeometry(R,64),new THREE.MeshStandardMaterial({color:0x23405f,roughness:.6,metalness:.2}));
+bottom.rotation.x=-Math.PI/2; bottom.position.y=.001; tank.add(bottom);
+const rim=new THREE.Mesh(new THREE.TorusGeometry(R,.045,12,80),new THREE.MeshStandardMaterial({color:0x7fb4ff,metalness:.7,roughness:.25}));
+rim.rotation.x=Math.PI/2; rim.position.y=H; tank.add(rim);
+const water=new THREE.Mesh(new THREE.CylinderGeometry(R,R,1,64),
+  new THREE.MeshPhysicalMaterial({color:0x2f8fe6,transparent:true,opacity:.75,roughness:.15,transmission:.4,thickness:.6}));
+tank.add(water);
+const surf=new THREE.Mesh(new THREE.CircleGeometry(R*.985,64),
+  new THREE.MeshStandardMaterial({color:0x7fc0ff,transparent:true,opacity:.65,roughness:.1}));
+surf.rotation.x=-Math.PI/2; tank.add(surf);
+for(let i=0;i<=6;i++){
+  const tick=new THREE.Mesh(new THREE.PlaneGeometry(.5,.02),new THREE.MeshBasicMaterial({color:0x8fd0ff,side:THREE.DoubleSide}));
+  tick.position.set(R+.02,i+.0001,0); tick.rotation.y=Math.PI/2; tank.add(tick);
+  const lbl=new THREE.Sprite(new THREE.SpriteMaterial({map:makeLabel(i+' ft'),transparent:true}));
+  lbl.position.set(R+.85,i+.15,0); lbl.scale.set(1.1,.55,1); tank.add(lbl);
+}
+function makeLabel(txt){
+  const c=document.createElement('canvas'); c.width=128; c.height=64;
+  const g=c.getContext('2d'); g.font='bold 34px Georgia'; g.fillStyle='#9fc4ff';
+  g.textAlign='center'; g.fillText(txt,64,44);
+  return new THREE.CanvasTexture(c);
+}
+const drops=[]; const dropGeo=new THREE.SphereGeometry(.05,8,8); const dropMat=new THREE.MeshBasicMaterial({color:0x6fc0ff,transparent:true,opacity:.8});
+for(let i=0;i<7;i++){const d=new THREE.Mesh(dropGeo,dropMat);scene.add(d);drops.push(d);}
+
+const hVal=document.getElementById('hVal'),vVal=document.getElementById('vVal');
+const hSlider=document.getElementById('hSlider'),playBtn=document.getElementById('playBtn');
+let h=H, playing=false, speed=1, last=performance.now();
+function setH(nh){
+  h=Math.max(0,Math.min(H,nh));
+  water.scale.y=h; water.position.y=h/2; surf.position.y=h;
+  water.visible=surf.visible=h>0.001;
+  hVal.textContent=h.toFixed(2);
+  vVal.textContent=(2.25*Math.PI*h).toFixed(2);
+  hSlider.value=h;
+}
+playBtn.onclick=()=>{playing=!playing;playBtn.textContent=playing?'Pause ⏸':'Drain ▶';};
+document.getElementById('resetBtn').onclick=()=>{setH(H);playing=false;playBtn.textContent='Drain ▶';};
+hSlider.oninput=e=>setH(parseFloat(e.target.value));
+document.getElementById('spd').oninput=e=>speed=parseFloat(e.target.value);
+function tick(now){
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(playing){ setH(h+RATE*dt*speed*3); if(h<=0){playing=false;playBtn.textContent='Drain ▶';} }
+  const t=now/1000;
+  drops.forEach((d,i)=>{const ph=((t*1.2+i/7)%1); d.position.set(R+.15,-.02-ph*1.1,0); d.material.opacity=.8*(1-ph);});
+  controls.update(); renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+new ResizeObserver(()=>{
+  camera.aspect=simEl.clientWidth/simEl.clientHeight; camera.updateProjectionMatrix();
+  renderer.setSize(simEl.clientWidth,simEl.clientHeight);
+}).observe(simEl);
+setH(H); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
